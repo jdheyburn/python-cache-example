@@ -3,12 +3,11 @@ from flask_caching import Cache
 import werkzeug
 import random
 
-
 app = Flask(__name__)
 cache = Cache(app, config={
     'CACHE_TYPE': 'simple',
     'DEBUG': True,
-    'CACHE_DEFAULT_TIMEOUT': 3600
+    'CACHE_DEFAULT_TIMEOUT': 3600  # 1 hour
 })
 
 
@@ -21,11 +20,23 @@ def put_greeting(greeting: str = ''):
     return greeting
 
 
+@app.route('/all_greetings/', methods=['GET'])
+def get_all_greeting():
+    dump_cache = []
+    for k in cache.cache._cache:
+        item = cache.get(k)
+        if item:
+            dump_cache.append(cache.get(k))
+    return {'greetings': dump_cache}
+
+
 @app.route('/greetings', methods=['GET'])
 def get_greeting() -> str:
     dump_cache = []
     for k in cache.cache._cache:
-        dump_cache.append(cache.get(k))
+        item = cache.get(k)
+        if item:
+            dump_cache.append(cache.get(k))
 
     if len(dump_cache) == 0:
         raise werkzeug.exceptions.NotFound
