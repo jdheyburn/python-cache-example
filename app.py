@@ -1,3 +1,4 @@
+from typing import Tuple
 from flask import Flask
 from flask_caching import Cache
 import werkzeug
@@ -12,7 +13,7 @@ cache = Cache(app, config={
 
 
 @app.route('/greetings/<greeting>', methods=['POST'])
-def put_greeting(greeting: str = ''):
+def put_greeting(greeting: str = '') -> str:
     greeting = greeting.strip()
     if len(greeting) == 0 or len(greeting) > 140:
         raise werkzeug.exceptions.BadRequest
@@ -21,7 +22,7 @@ def put_greeting(greeting: str = ''):
 
 
 @app.route('/all_greetings/', methods=['GET'])
-def get_all_greeting():
+def get_all_greeting() -> dict:
     dump_cache = []
     for k in cache.cache._cache:
         item = cache.get(k)
@@ -45,10 +46,10 @@ def get_greeting() -> str:
 
 
 @app.errorhandler(werkzeug.exceptions.BadRequest)
-def handle_greeting_too_long(e):
+def handle_greeting_too_long(e) -> Tuple[str, int]:
     return 'Invalid greeting', 400
 
 
 @app.errorhandler(werkzeug.exceptions.NotFound)
-def handle_no_greeting_found(e):
+def handle_no_greeting_found(e) -> Tuple[str, int]:
     return 'No greetings were found', 404
